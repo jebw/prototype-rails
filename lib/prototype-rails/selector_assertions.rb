@@ -1,14 +1,13 @@
 require 'active_support/core_ext/module/aliasing'
-require 'action_view/vendor/html-scanner'
 require 'action_dispatch/testing/assertions'
-require 'action_dispatch/testing/assertions/selector'
+#require 'action_dispatch/testing/assertions/selector'
 
 #--
 # Copyright (c) 2006 Assaf Arkin (http://labnotes.org)
 # Under MIT and/or CC By license.
 #++
 
-ActionDispatch::Assertions::SelectorAssertions.module_eval do
+module PrototypeRails::SelectorAssertions
   # Selects content from the RJS response.
   #
   # === Narrowing down
@@ -171,7 +170,7 @@ ActionDispatch::Assertions::SelectorAssertions.module_eval do
 
   # +assert_select+ and +css_select+ call this to obtain the content in the HTML
   # page, or from all the RJS statements, depending on the type of response.
-  def response_from_page_with_rjs
+  def response_from_page
     content_type = @response.content_type
 
     if content_type && Mime::JS =~ content_type
@@ -190,10 +189,9 @@ ActionDispatch::Assertions::SelectorAssertions.module_eval do
 
       root
     else
-      response_from_page_without_rjs
+      super
     end
   end
-  alias_method_chain :response_from_page, :rjs
 
   # Unescapes a RJS string.
   def unescape_rjs(rjs_string)
@@ -208,3 +206,5 @@ ActionDispatch::Assertions::SelectorAssertions.module_eval do
     unescaped
   end
 end
+
+Rails::Dom::Testing::Assertions.send(:include, PrototypeRails::SelectorAssertions)
